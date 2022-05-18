@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "mlops"
+version = "0.1.0"
+description = ""
+authors = ["Felipe Whitaker <felipe.whitaker@gympass.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+Flask = "^2.1.2"
+numpy = "^1.22.3"
+scikit-learn = "^1.1.0"
+pandas = "^1.4.2"
+
+[tool.poetry.dev-dependencies]
+kaggle = "^1.5.12"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
