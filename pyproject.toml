@@ -10,6 +10,7 @@ Flask = "^2.1.2"
 numpy = "^1.22.3"
 scikit-learn = "^1.1.0"
 pandas = "^1.4.2"
+torch = "^1.11.0"
 
 [tool.poetry.dev-dependencies]
 kaggle = "^1.5.12"
