@@ -7,7 +7,8 @@ from flask import Flask, request
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, precision_recall_fscore_support
+from sklearn.metrics import r2_score
+from torch_eg import Net
 
 app = Flask(__name__)
 # TODO allow other name for models folder
@@ -58,7 +59,14 @@ def predict():
 
     # TODO abstract model loading
     global MODELS_FOLDER
-    model_file = sorted(os.listdir(MODELS_FOLDER), key = lambda file: os.path.getmtime(os.path.join(MODELS_FOLDER, file)), reverse = True)[0]
+    # FIXME consider other models
+    model_file = sorted(
+        (file for file in os.listdir(MODELS_FOLDER) if file.startswith("LinearRegression")),
+        key = lambda file: os.path.getmtime(
+            os.path.join(MODELS_FOLDER, file)
+            ), 
+        reverse = True
+    )[0]
     app.logger.debug(f"Loading {model_file}")
     with open(os.path.join(MODELS_FOLDER, model_file), "rb") as f:
         clf = pickle.load(f)
@@ -86,6 +94,13 @@ def predict():
 
     return "{\"quality\":%.2f}"%preds[0]
 
+@app.route("/predict_net", methods = ["POST"])
+def predict_net():
+    file_path = "models/dense"
+    clf = Net.load(file_path)
+
+    data = request.get_json()
+    return "{\"quality\":%.2f}"%clf.predict_one(list(data.values()))
 
 if __name__ == "__main__":
     # FIXME debug=True for development
