@@ -1,4 +1,6 @@
-raise ImportError("Depends on C++ DLLs - see https://support.microsoft.com/help/2977003/the-latest-supported-visual-c-downloads")
+raise ImportError(
+    "Depends on C++ DLLs - see https://support.microsoft.com/help/2977003/the-latest-supported-visual-c-downloads"
+)
 
 if __name__ == "__main__":
 
