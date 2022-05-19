@@ -8,7 +8,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
-from torch_eg import Net
+from eg.pytorch import Net
 
 app = Flask(__name__)
 # TODO allow other name for models folder
