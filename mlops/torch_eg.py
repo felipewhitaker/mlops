@@ -7,20 +7,19 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
 import logging
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="{asctime} [{levelname}] {name} {message}",
     style="{",
-    handlers=[
-        logging.StreamHandler()
-    ],
+    handlers=[logging.StreamHandler()],
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 logger = logging.getLogger(__name__)
 
+
 class Net(nn.Module):
-     
     def __init__(self, input_: int, output_: int):
         super(Net, self).__init__()
         HIDDEN_SIZE = 4
@@ -36,7 +35,7 @@ class Net(nn.Module):
         X = torch.relu((self.hidden(X)))
         X = self.dense_output(X)
 
-        return torch.sum(X, dim = 1) # F.sigmoid(X) # F.log_softmax(X,dim=1)
+        return torch.sum(X, dim=1)  # F.sigmoid(X) # F.log_softmax(X,dim=1)
 
     @staticmethod
     def minmax_scaler(X):
@@ -51,7 +50,7 @@ class Net(nn.Module):
 
         # FIXME allow for different optmizers
         # FIXME allow different learning rates
-        optimizer = torch.optim.Adam(self.parameters(), lr = 1e-2)
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-2)
 
         for e in range(epochs):
             for batch in train_loader:
@@ -67,8 +66,7 @@ class Net(nn.Module):
                     val_loss = self.eval(val_loader)
                 logger.debug(f"{e=} loss={loss.item():.2f} {val_loss=:.2f}")
 
-    def eval(self, loader = DataLoader):
-
+    def eval(self, loader=DataLoader):
         def validation_step(self, batch):
             X, y = batch
             with torch.no_grad():
@@ -76,10 +74,11 @@ class Net(nn.Module):
             loss = self.loss_fn(preds, y)
             return loss.detach()
 
-        val_loss = torch.stack(tuple(
-            validation_step(self, batch) 
-            for batch in loader
-        )).mean().item()
+        val_loss = (
+            torch.stack(tuple(validation_step(self, batch) for batch in loader))
+            .mean()
+            .item()
+        )
         return val_loss
 
     def save(self, path):
@@ -100,8 +99,8 @@ class Net(nn.Module):
 if __name__ == "__main__":
 
     # FIXME abstract load and train test split
-    data = pd.read_csv("data/winequality-red.csv", nrows = 30)
-    X, y = data.drop(columns = "quality").to_numpy(), data["quality"].to_numpy()
+    data = pd.read_csv("data/winequality-red.csv", nrows=30)
+    X, y = data.drop(columns="quality").to_numpy(), data["quality"].to_numpy()
     X, y = torch.Tensor(X), torch.Tensor(y)
 
     dataset = TensorDataset(X, y)

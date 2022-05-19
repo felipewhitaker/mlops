@@ -14,7 +14,8 @@ app = Flask(__name__)
 # TODO allow other name for models folder
 MODELS_FOLDER = "models"
 
-@app.route("/train", methods = ["GET"])
+
+@app.route("/train", methods=["GET"])
 def train():
 
     # TODO receive data file
@@ -23,9 +24,13 @@ def train():
     app.logger.debug(f"Loaded data")
 
     # TODO receive train test split qtd
-    X, y = data.drop(columns = "quality"), data["quality"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .33, random_state = 42)
-    app.logger.debug(f"{X_train.shape=} {X_test.shape=}, {y_train.shape=}, {y_test.shape=}")
+    X, y = data.drop(columns="quality"), data["quality"]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33, random_state=42
+    )
+    app.logger.debug(
+        f"{X_train.shape=} {X_test.shape=}, {y_train.shape=}, {y_test.shape=}"
+    )
 
     # TODO receive model name
     # e.g. model_name = request.args.get("model")
@@ -37,10 +42,12 @@ def train():
 
     # TODO abstract model saving
     global MODELS_FOLDER
-    os.makedirs(MODELS_FOLDER, exist_ok = True)
+    os.makedirs(MODELS_FOLDER, exist_ok=True)
     # TODO better unique model naming
     # TODO store which features were used for the model to make sure prediction is done correctly
-    model_path = os.path.join(MODELS_FOLDER, f"{clf.__class__.__name__}_{datetime.now():%Y%m%d%H%M}.pickle")
+    model_path = os.path.join(
+        MODELS_FOLDER, f"{clf.__class__.__name__}_{datetime.now():%Y%m%d%H%M}.pickle"
+    )
     with open(model_path, "wb") as f:
         pickle.dump(clf, f)
     app.logger.debug(f"Saved {model_path=}")
@@ -49,9 +56,10 @@ def train():
 
     # precision, recall, fscore, support = precision_recall_fscore_support(y_test, preds)
     # app.logger.debug(f"Evaluated {precision=} {recall=} {fscore=} {support=}")
-    return "{\"r2\":%.2f}"%r2_score(y_test, preds)
+    return '{"r2":%.2f}' % r2_score(y_test, preds)
 
-@app.route("/predict", methods = ["POST"])
+
+@app.route("/predict", methods=["POST"])
 def predict():
 
     # TODO receive which model to be used
@@ -61,18 +69,20 @@ def predict():
     global MODELS_FOLDER
     # FIXME consider other models
     model_file = sorted(
-        (file for file in os.listdir(MODELS_FOLDER) if file.startswith("LinearRegression")),
-        key = lambda file: os.path.getmtime(
-            os.path.join(MODELS_FOLDER, file)
-            ), 
-        reverse = True
+        (
+            file
+            for file in os.listdir(MODELS_FOLDER)
+            if file.startswith("LinearRegression")
+        ),
+        key=lambda file: os.path.getmtime(os.path.join(MODELS_FOLDER, file)),
+        reverse=True,
     )[0]
     app.logger.debug(f"Loading {model_file}")
     with open(os.path.join(MODELS_FOLDER, model_file), "rb") as f:
         clf = pickle.load(f)
 
     # must receive "Content-Type: application/json", otherwise `force=True`
-    data = request.get_json() 
+    data = request.get_json()
 
     # FIXME check data that is coming in (related to data that was used to train the model)
     # {
@@ -90,18 +100,20 @@ def predict():
     # }
 
     # FIXME is it needed to transform dict into DataFrame?
-    preds = clf.predict(pd.DataFrame(data, index = [0]))
+    preds = clf.predict(pd.DataFrame(data, index=[0]))
 
-    return "{\"quality\":%.2f}"%preds[0]
+    return '{"quality":%.2f}' % preds[0]
 
-@app.route("/predict_net", methods = ["POST"])
+
+@app.route("/predict_net", methods=["POST"])
 def predict_net():
     file_path = "models/dense"
     clf = Net.load(file_path)
 
     data = request.get_json()
-    return "{\"quality\":%.2f}"%clf.predict_one(list(data.values()))
+    return '{"quality":%.2f}' % clf.predict_one(list(data.values()))
+
 
 if __name__ == "__main__":
     # FIXME debug=True for development
-    app.run(port = 8000, debug = True)
+    app.run(port=8000, debug=True)
