@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorFlow.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+</head>
+<body>
+    <script>
+        // tensorflow is imported as js
+        const model = await tf.loadLayersModel('model.json'); 
+        // FIXME allow receivng the values from the webpage
+        model.predict(tf.tensor2d([[-1.40863043, -0.81755432]])).print()
+    </script>
+
+</body>
+</html>
