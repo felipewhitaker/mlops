@@ -1,4 +1,4 @@
-data
+data/*
 .venv
-models
+models/*
 **/__pycache__
